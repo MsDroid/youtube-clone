@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components';
-import youtube from '../../img/logo.png';
+import youtube from '../img/logo.png';
 import { AiOutlineMenu} from 'react-icons/ai';
 import { BsSearch } from 'react-icons/bs';
 import { BiVideoPlus, BiUserCircle } from 'react-icons/bi';
@@ -13,7 +13,8 @@ box-shadow:0 0 2px 4px #ccc;
 position: sticky;
 top: 0;
 z-index: 999;
-background-color: white;
+background-color: ${({theme}) => theme.bg};
+color:${({theme}) => theme.text};
 `;
 
 const Row = styled.div`
@@ -51,6 +52,8 @@ padding:5px;
 border:1px solid #ccc;
 box-shodow:0 0 2px 4px #ccc;
 font-size:14px;
+background-color: ${({theme}) => theme.bg};
+color:${({theme}) => theme.text};
 `;
 
 const BtnWrapper = styled.div`

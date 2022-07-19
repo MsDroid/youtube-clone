@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
-import Thumbnail from '../../img/banner1.jpeg';
-import ChannelImg from '../../img/banner2.jpeg';
+import Thumbnail from '../img/banner1.jpeg';
+import ChannelImg from '../img/banner2.jpeg';
 
 const Container = styled.div`
 flex:7;
