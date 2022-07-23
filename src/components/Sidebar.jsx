@@ -1,23 +1,27 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { ThemeProvider } from 'styled-components';
 import { AiOutlineHome, AiOutlineCompass, AiOutlineClockCircle } from 'react-icons/ai';
-import { BsCameraReels, BsGear } from 'react-icons/bs';
+import { BsCameraReels, BsGear, BsSun } from 'react-icons/bs';
 import { MdOutlineVideoLibrary, MdOutlineVideoStable, MdOndemandVideo } from 'react-icons/md';
 import { FaHistory } from 'react-icons/fa';
+import { darkTheme, lightTheme } from '../utils/Theme';
+import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 
 const Container = styled.div`
 flex:1;
 position: sticky;
 top: 48px;
-background-color: white;
-
+background-color: ${({theme}) => theme.bg};
+color:${({theme}) => theme.text};
+height:100vh;
 `;
 
 const Wrapper = styled.div`
 padding:5px;
+border-right:0.2px solid #ccc;
 
-box-shadow: -1px 0px 2px 1px #ccc;
 `;
 
 const Items = styled.div`
@@ -28,7 +32,7 @@ margin-left:20px;
 font-size:16px;
 padding:5px 10px;
 font-weight:400;
-color:black;
+color:${({theme}) => theme.text};
 margin-bottom:10px;
 margin:10px;
 cursor:pointer;
@@ -41,9 +45,8 @@ cursor:pointer;
 
 const Hr = styled.hr`
 color:#ccc;
-height:1px;
 margin-bottom:10px;
-
+border:0.5px solid ${({theme}) => theme.soft}
 `;
 
 
@@ -65,61 +68,85 @@ padding:3px 7px;
 }
 `;
 
-const Sidebar = () => {
+const Sidebar = ({darkMode, setDarkMode}) => {
+
+    const { currentUser } = useSelector((state) => state.user)
+
     return ( 
-      <Container>
-        <Wrapper>
-            <Items>
-                <AiOutlineHome style={{fontSize:"20px"}}/>
-                Home
-            </Items>
-            <Items>
-                <AiOutlineCompass style={{fontSize:"20px"}}/>
-                Explore
-            </Items>
-            <Items>
-                <BsCameraReels style={{fontSize:"20px"}}/>
-                Shorts
-            </Items>
-            <Items>
-                <MdOutlineVideoLibrary style={{fontSize:"20px"}}/>
-                Subscriptions
-            </Items>
-            <Hr/>
-            <Title>
-                Please signin to unlock features.
-                <SigninBtn>
-                    Sign in
-                </SigninBtn>
-            </Title>
-            <Hr/>
-            <Items>
-                <MdOutlineVideoStable style={{fontSize:"20px"}}/>
-                Library
-            </Items>
-            <Items>
-                <FaHistory style={{fontSize:"20px"}}/>
-                History
-            </Items>
-            <Items>
-                <MdOndemandVideo style={{fontSize:"20px"}}/>
-                Your videos
-            </Items>
-            <Items>
-                <AiOutlineClockCircle style={{fontSize:"20px"}}/>
-                Watch later
-            </Items>
-            <Hr/>
-            <Items>
-                <BsGear style={{fontSize:"20px"}}/>
-                Setting
-            </Items>
-            <Items>
-                <AiOutlineHome style={{fontSize:"20px"}}/>
-                Theme
-            </Items>
-        </Wrapper>
-      </Container>
+        <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
+            <Container>
+                <Wrapper>
+                    <Link to="/" style={{color:"inherit", textDecoration:"none"}}>
+                    <Items>
+                        <AiOutlineHome style={{fontSize:"20px"}}/>
+                        Home
+                    </Items>
+                    </Link>
+
+                    <Link to="/trend" style={{color:"inherit", textDecoration:"none"}}>
+
+                    <Items>
+                        <AiOutlineCompass style={{fontSize:"20px"}}/>
+                        Trend
+                    </Items>
+                    </Link>
+
+                    <Link to="/shorts" style={{color:"inherit", textDecoration:"none"}}>
+                    <Items>
+                        <BsCameraReels style={{fontSize:"20px"}}/>
+                        Shorts
+                    </Items>
+                    </Link>
+
+                    <Link to="/subscriptions" style={{color:"inherit", textDecoration:"none"}}>
+                    <Items>
+                        <MdOutlineVideoLibrary style={{fontSize:"20px"}}/>
+                        Subscriptions
+                    </Items>
+                    </Link>
+
+                    <Hr/>
+                    { !currentUser &&
+                    <>
+                    <Title>
+                        Please signin to unlock features.
+                        <Link to="/signin" style={{color:"inherit", textDecoration:"none"}}>
+                        <SigninBtn>
+                            Sign in
+                        </SigninBtn>
+                        </Link>
+                    </Title>
+                    <Hr/>
+                    </>
+                    }
+                    <Items>
+                        <MdOutlineVideoStable style={{fontSize:"20px"}}/>
+                        Library
+                    </Items>
+                    <Items>
+                        <FaHistory style={{fontSize:"20px"}}/>
+                        History
+                    </Items>
+                    <Items>
+                        <MdOndemandVideo style={{fontSize:"20px"}}/>
+                        Your videos
+                    </Items>
+                    <Items>
+                        <AiOutlineClockCircle style={{fontSize:"20px"}}/>
+                        Watch later
+                    </Items>
+                    <Hr/>
+                    <Items>
+                        <BsGear style={{fontSize:"20px"}}/>
+                        Setting
+                    </Items>
+                    <Items onClick={() => setDarkMode(!darkMode)}>
+                        <BsSun style={{fontSize:"20px"}}/>
+                        Dark Mode
+                    </Items>
+                </Wrapper>
+            </Container>
+        </ThemeProvider>
      );
 }
  
