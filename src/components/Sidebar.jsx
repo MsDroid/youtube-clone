@@ -5,6 +5,8 @@ import { BsCameraReels, BsGear, BsSun } from 'react-icons/bs';
 import { MdOutlineVideoLibrary, MdOutlineVideoStable, MdOndemandVideo } from 'react-icons/md';
 import { FaHistory } from 'react-icons/fa';
 import { darkTheme, lightTheme } from '../utils/Theme';
+import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 
 const Container = styled.div`
@@ -13,11 +15,12 @@ position: sticky;
 top: 48px;
 background-color: ${({theme}) => theme.bg};
 color:${({theme}) => theme.text};
+height:100vh;
 `;
 
 const Wrapper = styled.div`
 padding:5px;
-border-right:0.5px solid #ccc;
+border-right:0.2px solid #ccc;
 
 `;
 
@@ -66,34 +69,56 @@ padding:3px 7px;
 `;
 
 const Sidebar = ({darkMode, setDarkMode}) => {
+
+    const { currentUser } = useSelector((state) => state.user)
+
     return ( 
         <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
             <Container>
                 <Wrapper>
+                    <Link to="/" style={{color:"inherit", textDecoration:"none"}}>
                     <Items>
                         <AiOutlineHome style={{fontSize:"20px"}}/>
                         Home
                     </Items>
+                    </Link>
+
+                    <Link to="/trend" style={{color:"inherit", textDecoration:"none"}}>
+
                     <Items>
                         <AiOutlineCompass style={{fontSize:"20px"}}/>
-                        Explore
+                        Trend
                     </Items>
+                    </Link>
+
+                    <Link to="/shorts" style={{color:"inherit", textDecoration:"none"}}>
                     <Items>
                         <BsCameraReels style={{fontSize:"20px"}}/>
                         Shorts
                     </Items>
+                    </Link>
+
+                    <Link to="/subscriptions" style={{color:"inherit", textDecoration:"none"}}>
                     <Items>
                         <MdOutlineVideoLibrary style={{fontSize:"20px"}}/>
                         Subscriptions
                     </Items>
+                    </Link>
+
                     <Hr/>
+                    { !currentUser &&
+                    <>
                     <Title>
                         Please signin to unlock features.
+                        <Link to="/signin" style={{color:"inherit", textDecoration:"none"}}>
                         <SigninBtn>
                             Sign in
                         </SigninBtn>
+                        </Link>
                     </Title>
                     <Hr/>
+                    </>
+                    }
                     <Items>
                         <MdOutlineVideoStable style={{fontSize:"20px"}}/>
                         Library
@@ -117,7 +142,7 @@ const Sidebar = ({darkMode, setDarkMode}) => {
                     </Items>
                     <Items onClick={() => setDarkMode(!darkMode)}>
                         <BsSun style={{fontSize:"20px"}}/>
-                        LightMode
+                        Dark Mode
                     </Items>
                 </Wrapper>
             </Container>
