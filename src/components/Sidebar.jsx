@@ -7,6 +7,9 @@ import { FaHistory } from 'react-icons/fa';
 import { darkTheme, lightTheme } from '../utils/Theme';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { FiLogOut } from 'react-icons/fi';
+import { useDispatch } from 'react-redux'
+import { logOut } from '../redux/userSlice';
 
 
 const Container = styled.div`
@@ -71,6 +74,11 @@ padding:3px 7px;
 const Sidebar = ({darkMode, setDarkMode}) => {
 
     const { currentUser } = useSelector((state) => state.user)
+    const dispatch = useDispatch()
+
+    const handleLogout = () => {
+        dispatch(logOut());
+    }
 
     return ( 
         <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
@@ -140,10 +148,14 @@ const Sidebar = ({darkMode, setDarkMode}) => {
                         <BsGear style={{fontSize:"20px"}}/>
                         Setting
                     </Items>
-                    <Items onClick={() => setDarkMode(!darkMode)}>
+                    {/* <Items onClick={() => setDarkMode(!darkMode)}>
                         <BsSun style={{fontSize:"20px"}}/>
                         Dark Mode
-                    </Items>
+                    </Items> */}
+                    {currentUser && <Items onClick={handleLogout}>
+                        <FiLogOut style={{fontSize:"20px"}}/>
+                        Logout
+                    </Items>}
                 </Wrapper>
             </Container>
         </ThemeProvider>

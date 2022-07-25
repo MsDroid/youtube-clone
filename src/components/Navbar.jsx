@@ -89,6 +89,17 @@ gap: 10px;
 align-items: center;
 `;
 
+const Avatar = styled.img`
+width:25px;
+height:25px;
+border-radius:50%;
+background-color:#999;
+`;
+
+
+const userName = styled.h3`
+font-size:18px`;  
+
 const NavBar = () => {
 
     const {currentUser}  = useSelector((state) => state.user);
@@ -100,7 +111,7 @@ const NavBar = () => {
                 <Logo>
                     <AiOutlineMenu style={{marginRight:"10px"}}/>
                     <LogoImg src={youtube}/>
-                    YouTube
+                    VLogo
                 </Logo>
                 </Link>
                 <Search>
@@ -111,9 +122,12 @@ const NavBar = () => {
                 </Search>
                 <BtnWrapper>
                     {currentUser ? (<User>
-                    <BiVideoPlus style={{fontSize:"18px"}}/>
-                    <IoIosNotificationsOutline style={{fontSize:"18px"}}/>
+                    <BiVideoPlus style={{fontSize:"30px"}}/>
+                    <Avatar src={currentUser.img} style={{fontSize:"18px"}}/>
+                    <userName>
                     {currentUser.name}
+                    </userName>
+                    
                     </User> )
                     :<Link to="/signin" style={{color:"inherit", textDecoration:"none"}}>
                     <SigninBtn>

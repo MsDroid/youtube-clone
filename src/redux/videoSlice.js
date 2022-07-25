@@ -1,35 +1,30 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-  currentUser: null,
+  currentVideo: null,
   loading : false,
   error : false,
 }
 
 export const videoSlice = createSlice({
-  name: 'user',
+  name: 'video',
   initialState,
   reducers: {
-    loginStart : (state) => {
+    videoStart : (state) => {
         state.loading = true;
     },
-    loginSuccess : (state, action) => {
+    videoSuccess : (state, action) => {
         state.loading = false;
-        state.currentUser = action.payload;
+        state.currentVideo = action.payload;
     },
-    loginFailure : (state, error) => {
+    videoFailure : (state, error) => {
         state.loading = false;
         state.error = true;
     },
-    logOut : (state) => {
-        state.currentUser = null;
-        state.loading = false;
-        state.error = false;
-    }
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { loginStart, loginSuccess, loginFailure, logOut } = videoSlice.actions
+export const { videoStart, videoSuccess, videoFailure } = videoSlice.actions
 
 export default videoSlice.reducer
