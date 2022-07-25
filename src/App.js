@@ -30,7 +30,7 @@ color:${({theme}) => theme.text};
 
 
 export default function App() {
-  const [ darkMode, setDarkMode] = useState(true);
+  const [ darkMode, setDarkMode] = useState(false);
 
   return (
     <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
