@@ -17,7 +17,7 @@ export const videoSlice = createSlice({
         state.loading = false;
         state.currentVideo = action.payload;
     },
-    videoFailure : (state, error) => {
+    videoFailure : (state) => {
         state.loading = false;
         state.error = true;
     },

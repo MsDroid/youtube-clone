@@ -5,7 +5,12 @@ import { RiShareForwardLine } from 'react-icons/ri';
 import { BiCut, BiListPlus } from 'react-icons/bi';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
 // import { darkTheme, lightTheme } from '../utils/Theme';
+import { videoSuccess } from '../redux/videoSlice';
+import { format } from 'timeago.js';
+import Comments from '../components/Comments';
+
 
 const Container = styled.div`
 flex:7;
@@ -15,6 +20,17 @@ display:flex;padding:10px;
 const Content = styled.div`
 flex:5;
 padding:10px;
+`;
+
+const VideoWrapper = styled.div`
+
+`;
+
+const VideoFrame = styled.video`
+width:100%;
+max-height: 720px;
+background-color: #ccc;
+object-fit:cover;
 `;
 
 const Title = styled.h1`
@@ -55,35 +71,121 @@ background-color: transparent;
 `;
 
 const Hr = styled.hr`
-color:${({theme})=>theme.soft};
+color:#ccc;
 margin-bottom:10px;
-border:0.5px solid ${({theme}) => theme.soft}
+border:0.5px solid #ccc;
 `;
 
-const ChannelInfo = styled.div`
+const Channel = styled.div`
 display:flex;
-align-item:center;
+align-items:center;
 justify-content:space-between;
 `;
 
-const Avatar = styled.img``;
 
-const ChannelName = styled.h2``;
+const ChannelInfo = styled.div`
+display:flex;
+gap:10px;
+align-items:center;
+`;
 
-const SubscriberCount = styled.p``;
+const Image = styled.img`
+width:52px;
+height:52px;
+background-color:#ccc;
 
-const Subscribe = styled.button``;
+`;
+
+const ChannelDetails = styled.div``;
+
+const ChannelName = styled.h2`
+font-size:14px;
+margin:0;
+`;
 
 
-const Recommended = styled.div`flex:2`;
+const ChannelCounter = styled.div`
+font-size:12px;
+font-weight:400;
+color:#606060;
+`;
+
+const Description = styled.div`
+font-size:14px;
+font-weight:400;
+margin-top:20px;
+`;
+
+const Subscribe = styled.button`
+background-color:red;
+font-size:16px;
+cursor:pointer;
+padding:10px 16px;
+text-transform:uppercase;
+letter-spacing:0.5px;
+font-weight:500px;
+border-radius:2px;
+color:white;
+border:none;
+&:hover{
+  border:1px solid #606060;
+}
+`;
+
+const Comment = styled.div`
+flex:7;
+margin:20px 0px;
+
+`;
+
+const CommentWrapper = styled.div`
+display:flex;
+align-items:center;
+`;
+
+const CommentCount = styled.div`
+color:#606060;
+font-size:14px;
+font-weight:400;
+letter-space:1px;
+margin-bottom:20px;
+`;
+
+const CommentInput = styled.input`
+border:none;
+width:100%;
+border-bottom:1px solid #ccc;
+padding:10px 16px;
+&:focus{
+  boder:none;
+  outline:1px solid #ccc;
+}
+`;
+
+
+const CommentButton = styled.button`
+padding:10px 16px;
+margin-left:10px;
+border:none;
+cursor:pointer;
+&:hover{
+  border:1px solid #606060;
+}
+`;
+
+
+
+
+const Recommended = styled.div``;
 
 
 export const Video = () => {
+  const { currentUser } = useSelector((state) => state.user);
+  const { currentVideo } = useSelector((state) => state.video);
 
   const path = useLocation().pathname.split("/")[2];
-  console.log(path);
-
   const [channel, setChannel] = useState({});
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -92,25 +194,33 @@ export const Video = () => {
         const channelRes = await axios.get(
           `http://localhost:8800/api/users/find/${videoRes.data.userId}`
         );
-
-        console.log(videoRes.data);
-        console.log(channelRes.data);
         setChannel(channelRes.data);
-        // dispatch(fetchSuccess(videoRes.data));
+        dispatch(videoSuccess(videoRes.data));
       } catch (err) {}
     };
     fetchData();
-  }, [path]);
+  }, [path, dispatch]);
+
+
+const handleSub = async () => {
+  currentUser.subscribedUsers.includes(channel._id)
+      ? await axios.put(`http://localhost:8800/api/users/unsub/${channel._id}`)
+      : await axios.put(`http://localhost:8800/api/users/sub/${channel._id}`);
+    dispatch(subscription(channel._id));
+}
+
 
   return (
     <Container>
         <Content>
-          <iframe width="853" height="480" src={channel.videoUrl} title="Ik Mulaqaat - Dream Girl | Ayushmann Khurrana, Nushrat Bharucha | Meet Bros Ft. Altamash F & Palak M" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-          <Title>New Punjabi songs comes</Title>
+          <VideoWrapper>
+            <VideoFrame src={currentVideo.videoUrl} controls ></VideoFrame>
+          </VideoWrapper>
+          <Title>{currentVideo.title}</Title>
           <Details>
-            <Views>308,866,616 viewsSep 3, 2019</Views>
+            <Views>{currentVideo.views} views {format(currentVideo.createdAt)}</Views>
             <Buttons>
-              <Button><FiThumbsUp/>1.8M</Button>
+              <Button><FiThumbsUp/>{currentVideo.likes.length}</Button>
               <Button><FiThumbsDown/>DISLIKE</Button>
               <Button><RiShareForwardLine/> SHARE</Button>
               <Button><BiCut/> CLIP</Button>
@@ -119,11 +229,39 @@ export const Video = () => {
           </Details>
           <Hr/>
 
+          <Channel>
           <ChannelInfo>
-            <Avatar src=''></Avatar>
+            <Image src={channel.img} />
+            <ChannelDetails>
+              <ChannelName>{channel.name}</ChannelName>
+              <ChannelCounter>{channel.subscribers} subscribers</ChannelCounter>
+              <Description>{currentVideo.desc}</Description>
+            </ChannelDetails>
           </ChannelInfo>
+          <Subscribe onClick={handleSub}>
+            {currentUser.subscribedUsers?.includes(channel._id)
+              ? "SUBSCRIBED"
+              : "SUBSCRIBE"}
+          </Subscribe>
+        </Channel>
+        <Hr/>
+
+        <Comment>
+          <CommentCount>124 Comments</CommentCount>
+          <CommentWrapper>
+            <Image src={currentUser.img}/>
+            <CommentInput/>
+            <CommentButton>
+              COMMENT
+            </CommentButton>
+          </CommentWrapper>
+        </Comment>
+
+        <Comments/>
+        
         </Content>
         <Recommended>Recomended</Recommended>
     </Container>
   )
 }
+

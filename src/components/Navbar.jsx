@@ -97,7 +97,7 @@ background-color:#999;
 `;
 
 
-const userName = styled.h3`
+const UserName = styled.h3`
 font-size:18px`;  
 
 const NavBar = () => {
@@ -124,9 +124,9 @@ const NavBar = () => {
                     {currentUser ? (<User>
                     <BiVideoPlus style={{fontSize:"30px"}}/>
                     <Avatar src={currentUser.img} style={{fontSize:"18px"}}/>
-                    <userName>
+                    <UserName>
                     {currentUser.name}
-                    </userName>
+                    </UserName>
                     
                     </User> )
                     :<Link to="/signin" style={{color:"inherit", textDecoration:"none"}}>
