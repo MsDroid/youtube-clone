@@ -7,9 +7,11 @@ import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
 // import { darkTheme, lightTheme } from '../utils/Theme';
-import { videoSuccess } from '../redux/videoSlice';
+import { videoSuccess, like, dislike, videoStart} from '../redux/videoSlice';
 import { format } from 'timeago.js';
 import Comments from '../components/Comments';
+import Recommend from '../components/Recommend';
+import { subscription } from '../redux/userSlice';
 
 
 const Container = styled.div`
@@ -93,6 +95,7 @@ const Image = styled.img`
 width:52px;
 height:52px;
 background-color:#ccc;
+border-radius:50%;
 
 `;
 
@@ -134,7 +137,7 @@ border:none;
 
 const Comment = styled.div`
 flex:7;
-margin:20px 0px;
+margin:30px 0px;
 
 `;
 
@@ -156,6 +159,7 @@ border:none;
 width:100%;
 border-bottom:1px solid #ccc;
 padding:10px 16px;
+margin-left:20px;
 &:focus{
   boder:none;
   outline:1px solid #ccc;
@@ -173,6 +177,12 @@ cursor:pointer;
 }
 `;
 
+const RTitle = styled.h3`
+font-size : 16px;
+color:#606060;
+padding:5px;
+`;
+
 
 
 
@@ -187,6 +197,9 @@ export const Video = () => {
   const [channel, setChannel] = useState({});
   const dispatch = useDispatch();
 
+  
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -194,6 +207,8 @@ export const Video = () => {
         const channelRes = await axios.get(
           `http://localhost:8800/api/users/find/${videoRes.data.userId}`
         );
+        // console.log(videoRes.data);
+
         setChannel(channelRes.data);
         dispatch(videoSuccess(videoRes.data));
       } catch (err) {}
@@ -202,26 +217,43 @@ export const Video = () => {
   }, [path, dispatch]);
 
 
-const handleSub = async () => {
-  currentUser.subscribedUsers.includes(channel._id)
-      ? await axios.put(`http://localhost:8800/api/users/unsub/${channel._id}`)
-      : await axios.put(`http://localhost:8800/api/users/sub/${channel._id}`);
-    dispatch(subscription(channel._id));
-}
+
+  const handleLike = async () => {
+    const token = currentUser.token;
+    await axios.put(`http://localhost:8800/api/users/like/${currentVideo._id}`,{'access_token':token});
+    dispatch(like(currentUser._id));
+  };
+
+  const handleDisLike = async () => {
+    const token = currentUser.token;
+        await axios.put(`http://localhost:8800/api/users/dislike/${currentVideo._id}`,{'access_token':token});
+        dispatch(dislike(currentUser._id));
+  }
+
+  const handleSub = async () => {
+    const token = currentUser.token;
+    currentUser.subscribedUsers.includes(channel._id)
+        ? await axios.put(`http://localhost:8800/api/users/unsub/${channel._id}`,{'access_token':token})
+        : await axios.put(`http://localhost:8800/api/users/sub/${channel._id}`,{'access_token':token});
+      dispatch(subscription(channel._id));
+  }
+
 
 
   return (
     <Container>
         <Content>
           <VideoWrapper>
-            <VideoFrame src={currentVideo.videoUrl} controls ></VideoFrame>
+            <VideoFrame src={currentVideo?.videoUrl} controls >
+              <source src={currentVideo?.videoUrl} type="video/mp4"/>
+            </VideoFrame>
           </VideoWrapper>
-          <Title>{currentVideo.title}</Title>
+          <Title>{currentVideo?.title}</Title>
           <Details>
-            <Views>{currentVideo.views} views {format(currentVideo.createdAt)}</Views>
+            <Views>{currentVideo?.views} views {format(currentVideo?.createdAt)}</Views>
             <Buttons>
-              <Button><FiThumbsUp/>{currentVideo.likes.length}</Button>
-              <Button><FiThumbsDown/>DISLIKE</Button>
+              <Button onClick={handleLike}><FiThumbsUp/>{currentVideo?.likes.length}</Button>
+              <Button onClick={handleDisLike}><FiThumbsDown/>DISLIKE</Button>
               <Button><RiShareForwardLine/> SHARE</Button>
               <Button><BiCut/> CLIP</Button>
               <Button><BiListPlus/> SAVE</Button>
@@ -235,12 +267,12 @@ const handleSub = async () => {
             <ChannelDetails>
               <ChannelName>{channel.name}</ChannelName>
               <ChannelCounter>{channel.subscribers} subscribers</ChannelCounter>
-              <Description>{currentVideo.desc}</Description>
+              <Description>{currentVideo?.desc}</Description>
             </ChannelDetails>
           </ChannelInfo>
           <Subscribe onClick={handleSub}>
-            {currentUser.subscribedUsers?.includes(channel._id)
-              ? "SUBSCRIBED"
+            {currentUser?.subscribedUsers?.includes(channel._id)
+              ? "UNSUBSCRIBE"
               : "SUBSCRIBE"}
           </Subscribe>
         </Channel>
@@ -249,18 +281,30 @@ const handleSub = async () => {
         <Comment>
           <CommentCount>124 Comments</CommentCount>
           <CommentWrapper>
-            <Image src={currentUser.img}/>
-            <CommentInput/>
+            <Image src={currentUser?.img}/>
+            <CommentInput placeholder="Say Somthing..."/>
             <CommentButton>
               COMMENT
             </CommentButton>
           </CommentWrapper>
         </Comment>
 
-        <Comments/>
+
+              {/* component */}
+        <Comments videoId = {currentVideo._id}/>
+        {/* end component */}
         
         </Content>
-        <Recommended>Recomended</Recommended>
+
+
+        <Recommended>
+          <RTitle>Recommended Videos</RTitle>
+        
+              <Recommend tags = {currentVideo.tags}/>
+          
+          
+          
+        </Recommended>
     </Container>
   )
 }

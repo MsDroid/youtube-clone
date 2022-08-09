@@ -101,6 +101,7 @@ const UserName = styled.h3`
 font-size:18px`;  
 
 const NavBar = () => {
+    
 
     const {currentUser}  = useSelector((state) => state.user);
 
