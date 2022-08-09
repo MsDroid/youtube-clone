@@ -6,6 +6,7 @@ import { loginStart, loginSuccess, loginFailure, logOut } from '../redux/userSli
 import { useNavigate } from 'react-router-dom';
 import { auth, provider } from '../firebase';
 import { signInWithPopup } from 'firebase/auth';
+import { useCookies } from 'react-cookie';
 
 
 const Container = styled.div`
@@ -77,12 +78,17 @@ const Link = styled.span`
 
 
 export const Signin = () => {
+  // const [currentUser] = useSelector((state) => state.user);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [cookies, setCookie] = useCookies(['access_token']);
+
+   
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -90,9 +96,12 @@ export const Signin = () => {
     try {
       const res = await axios.post("http://localhost:8800/api/auth/signin", { name, password });
       dispatch(loginSuccess(res.data));
+      const token = res.data.token;
+      setCookie('access_token', token);
       navigate("/")
     } catch (err) {
       dispatch(loginFailure());
+      
     }
   };
   

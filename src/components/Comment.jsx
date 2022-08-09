@@ -1,21 +1,26 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { useSelector } from 'react-redux';
 import { AiOutlineLike } from 'react-icons/ai';
 import { BiDislike } from 'react-icons/bi';
 import { VscReply } from 'react-icons/vsc';
+import axios from 'axios';
 
 const Container = styled.div`
 display:flex;
-margin-bottom:10px;
+margin-top:35px;
 `;
 
 
-const CommentWrapper = styled.div``;
+const CommentWrapper = styled.div`
+margin-left:20px;
+`;
 
 const Image = styled.img`
 width:52px;
 height:52px;
+border-radius:50%;
+background-color:#ccc;
 `;
 
 const UserName = styled.span`
@@ -54,12 +59,26 @@ color:#606060;`;
 const Buttons = styled.div``;
 
 
-const Comment = () => {
+const Comment = ({videoId}) => {
     const { currentUser } = useSelector((state) => state.user );
+    const [comments, setComments] = useState([]);
+    
+    useEffect(() => {
+    const fetchComments = async () => {
+        const token = currentUser.token;
+      try {
+        const res = await axios.get(`http://localhost:8800/api/comments/${videoId}`, {'access_token' : token});
+        setComments(res.data);
+      } catch (err) {}
+    };
+    fetchComments();
+  }, [videoId]);
 
     return ( 
+        <>
+        {comments.map((comment) => (
         <Container>
-        <Image src= {currentUser.img}/>
+        <Image src= {currentUser?.img}/>
         <CommentWrapper>
         <UserName>user 1</UserName>
         <CommentDate>1 day ago</CommentDate>
@@ -71,6 +90,8 @@ const Comment = () => {
         </Buttons>
         </CommentWrapper>
         </Container>
+        ))}
+        </>
      );
 }
  
